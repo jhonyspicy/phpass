@@ -6,7 +6,12 @@ namespace Hautelook\Phpass;
  *
  * Portable PHP password hashing framework.
  *
- * Version 0.3 / genuine.
+ * Version 1.0.0 - modified by Nordstromrack.com | HauteLook
+ *
+ * Change Log:
+ *
+ * - the hash_equals function is now used instead of == or === to prevent
+ *   timing attacks
  *
  * Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
  *
@@ -66,11 +71,11 @@ class PasswordHash
     public function get_random_bytes($count)
     {
         $output = '';
-        
+
         if (is_callable('random_bytes')) {
             return random_bytes($count);
         }
-        
+
         if (@is_readable('/dev/urandom') &&
             ($fh = @fopen('/dev/urandom', 'rb'))) {
             $output = fread($fh, $count);
@@ -291,7 +296,7 @@ class PasswordHash
 
         $hash =
             $this->crypt_private($password,
-            $this->gensalt_private($random));
+                $this->gensalt_private($random));
         if (strlen($hash) == 34) {
             return $hash;
         }
@@ -314,6 +319,6 @@ class PasswordHash
             $hash = crypt($password, $stored_hash);
         }
 
-        return $hash === $stored_hash;
+        return hash_equals($stored_hash, $hash);
     }
 }
